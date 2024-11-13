@@ -1,0 +1,30 @@
+.item-padding-left{
+    padding-top: 5px;
+    padding-left: 1rem;
+    /* width: 8%; */
+}
+.input-width{
+    width: 15%;
+}
+.item-padding-top{
+    padding-top: 10px;
+}
+.font-right{
+    text-align: right;
+}
+.font-center{
+    text-align: center;
+}
+.buttonStyle{
+    width:21%;
+    position: relative;
+}
+.buttonPosition{
+    position: absolute;
+}
+.symbolStyle {
+    text-align: center;
+    padding-top: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+}

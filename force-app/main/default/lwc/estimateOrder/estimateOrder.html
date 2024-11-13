@@ -1,0 +1,15 @@
+<!-- 見積の受注ボタン -->
+<template>
+    <div style="position: relative;">
+        <template if:true={isLoading}>
+            <lightning-spinner alternative-text="Loading" variant="brand" size="large"></lightning-spinner>
+        </template>
+        <lightning-quick-action-panel header="受注">
+            受注します。よろしいでしょうか。
+            <div slot="footer" class="slds-grid slds-grid_align-center">
+                <lightning-button variant="neutral" label="キャンセル" onclick={doCancel}></lightning-button>
+                <lightning-button variant="brand" label="確定" class="slds-m-left_x-small" onclick={doCommit}></lightning-button>
+            </div>
+        </lightning-quick-action-panel>
+    </div>
+</template>

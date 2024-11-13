@@ -1,0 +1,184 @@
+<!--
+  @description       : 請求書作成
+  @author            : ItForce-bai
+  @group             : ItForce
+  @last modified on  : 2024-11-11
+  @last modified by  : ItForce-bai
+  Modifications Log
+  Ver   Date         Author        Modification
+  1.0   2024-11-01   ItForce-bai   Initial Version
+-->
+<template>
+    <template if:true={isLoading}>
+        <lightning-spinner class="slds-is-fixed" alternative-text="Loading" variant="brand"
+            size="medium"></lightning-spinner>
+    </template>
+    <lightning-card variant="Narrow" title="検索条件" icon-name="standard:search">
+        <!-- ボタン -->
+        <div slot="actions">
+            <lightning-button label="検索" title="検索" icon-name="utility:search" class="slds-m-left_x-small"
+                onclick={doSearch}></lightning-button>
+            <lightning-button label="クリア" title="クリア" icon-name="utility:refresh" class="slds-m-left_x-small"
+                onclick={doClear}></lightning-button>
+        </div>
+        <!-- 検索条件 -->
+        <div>
+            <!-- 検索条件の1行目 -->
+            <lightning-layout multiple-rows class="item-padding-top">
+                <div class="slds-col slds-size_1-of-12 item-padding-left">
+                    <span>
+                        <label class="slds-form-element__label" for="select-03">請求先</label>
+                    </span>
+                </div>
+                <div class="slds-col slds-size_2-of-12 input-width">
+                    <c-look-up
+                        placeholder="請求先を選択"
+                        object-type='Account'
+                        name="billingAcc"
+                        value={conditionInfo.billingAcc}
+                        icon-name="standard:account"
+                        onchange={doChange}
+                        orderby='Name'>
+                    </c-look-up>
+                </div>
+                <div class="slds-col slds-size_1-of-12 item-padding-left">
+                    <span>
+                        <label class="slds-form-element__label" for="select-03">請求日</label>
+                    </span>
+                </div>
+                <div class="slds-col slds-size_1-of-12">
+                    <lightning-input type="date" name="billingFromDate" variant="label-hidden" onchange={doChange}
+                        value={conditionInfo.billingFromDate}>
+                    </lightning-input>
+                </div>
+                <span class="symbolStyle">～</span>
+                <div class="slds-col slds-size_1-of-12">
+                    <lightning-input type="date" name="billingToDate" variant="label-hidden" onchange={doChange}
+                        value={conditionInfo.billingToDate}>
+                    </lightning-input>
+                </div>
+                <div class="slds-col slds-size_2-of-12" style="width:11%;">
+                    <lightning-button variant="brand" label="前月" title="前月" onclick={doGetBeforeMonth}
+                        class="slds-m-left_x-small"></lightning-button>
+                    <lightning-button variant="brand" label="翌月" title="翌月" onclick={doGetNextMonth}
+                        class="slds-m-left_x-small"></lightning-button>
+                </div>
+                <div class="slds-col slds-size_1-of-12 item-padding-left" style="width: 9%;">
+                    <lightning-input type="checkbox" label="発行済含む" name="issueStatus" onchange={doChange}
+                        checked={conditionInfo.issueStatus}></lightning-input>
+                </div>
+            </lightning-layout>
+        </div>
+    </lightning-card>
+    <div style="height: 0.5rem;"></div>
+
+    <lightning-card variant="Narrow" title={title} icon-name="standard:entitlement">
+        <template if:true={tabShowFlg}>
+            <!-- ボタン -->
+            <div slot="actions">
+                <lightning-button label="請求書作成" title="請求書作成" variant="brand-outline" icon-name="utility:download"
+                    class="slds-m-left_x-small" onclick={doDownload}></lightning-button>
+            </div>
+        </template>
+        <div style="min-height: 30rem;">
+            <template if:true={tabShowFlg}>
+                <!-- ヘッダー -->
+                <table class="slds-table slds-table_bordered slds-table_fixed-layout slds-table_col-bordered" role="grid">
+                    <thead>
+                        <tr class="slds-text-title_caps slds-line-height_reset">
+                            <th scope="col" class="font-center" style="width:6%;">
+                                <div class="slds-truncate">
+                                    <div class="font-center">印刷</div>
+                                    <lightning-input onchange={doAllSelected} checked={requestAllCheckFlg} type="checkbox"
+                                        variant="label-hidden" data-name="allCheckBox"></lightning-input>
+                                </div>
+                            </th>
+                            <th scope="col" class="font-center" style="width:10%">
+                                <div class="slds-truncate" title="請求期日">請求期日</div>
+                            </th>
+                            <th scope="col" class="font-center" style="width:10%">
+                                <div class="slds-truncate" title="商談名">商談名</div>
+                            </th>
+                            <th scope="col" class="font-center" style="width:10%">
+                                <div class="slds-truncate" title="見積No">見積No</div>
+                            </th>
+                            <th scope="col" class="font-center" style="width:10%">
+                                <div class="slds-truncate" title="請求No">請求No</div>
+                            </th>
+                            <th scope="col" class="font-center" style="width:8%">
+                                <div class="slds-truncate" title="請求金額">請求金額</div>
+                            </th>
+                            <th scope="col" class="font-center" style="width:5%">
+                                <div class="slds-truncate" title="請求書作成済み">請求書作成済み</div>
+                            </th>
+                            <template if:true={changeScroll}>
+                                <th scope="col" class="font-center" style="width:0.9%;"></th>
+                            </template>
+                        </tr>
+                    </thead>
+                </table>
+                <!-- ボディ -->
+                <div  style="max-height: 25rem; min-height: 25rem;" class="slds-scrollable">
+                    <table class="slds-table slds-table_bordered slds-table_fixed-layout slds-table_col-bordered" role="grid">
+                        <tbody>
+                            <template for:each={resultList} for:item="result" for:index="idx">
+                                <tr class="slds-hint-parent" key={result.Id} oncontextmenu={doSelectedRequest}>
+                                    <td scope="col" class="font-center" style="width:6%;">
+                                        <lightning-formatted-text hidden class="slds-hidden" variant="label-hidden"
+                                            data-name="resultId" value={idx}></lightning-formatted-text>
+                                        <lightning-input onchange={doSelectedRequest} checked={result.selectFlg} type="checkbox"
+                                            data-index={idx} data-name="resultCheckBox"
+                                            variant="label-hidden"></lightning-input>
+                                    </td>
+                                    <td scope="col" class="font-center" style="width:10%;">
+                                        <lightning-formatted-date-time
+                                            value={result.RQ_InvoiceSendDate__c}></lightning-formatted-date-time>
+                                    </td>
+                                    <td scope="col" style="width:10%;">
+                                        <a href={result.OppLink} tabindex="-1"
+                                            target="_blank">{result.RQ_Opportunity__r.Name}</a>
+                                    </td>
+                                    <td scope="col" style="width:10%;">
+                                        <a href={result.EstimateLink} tabindex="-1"
+                                            target="_blank">{result.RQ_Estimate__r.Name}</a>
+                                    </td>
+                                    <td scope="col" style="width:10%;">
+                                        <a href={result.RequestLink} tabindex="-1" target="_blank">{result.Name}</a>
+                                    </td>
+                                    <td scope="col" class="font-right" style="width:8%;">
+                                        <lightning-formatted-number data-name="BillingAmount" maximum-fraction-digits="2"
+                                            value={result.RQ_RequestAmount__c}></lightning-formatted-number>
+                                    </td>
+                                    <td scope="col" class="font-center" style="width:5%;">
+                                        <lightning-input type="checkbox" checked={result.RQ_InvoicedFlg__c}
+                                            variant="label-hidden" disabled></lightning-input>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- フッター -->
+                <table class="slds-table slds-table_bordered slds-table_fixed-layout slds-table_col-bordered" role="grid">
+                    <thead>
+                        <tr class="slds-text-title_caps slds-line-height_reset" style="z-index: 5000;">
+                            <th scope="col" class="font-center" style="width:6%"></th>
+                            <th scope="col" class="font-center" style="width:10%"></th>
+                            <th scope="col" class="font-center" style="width:10%"></th>
+                            <th scope="col" class="font-center" style="width:10%"></th>
+                            <th scope="col" class="font-center" style="width:10%"></th>
+                            <th scope="col" class="font-right" style="width:8%">
+                                <lightning-formatted-number maximum-fraction-digits="2"
+                                    value={TotalBillingAmount}></lightning-formatted-number>
+                            </th>
+                            <th scope="col" class="font-center" style="width:5%"></th>
+                            <template if:true={changeScroll}>
+                                <th scope="col" class="font-center" style="width:0.9%;"></th>
+                            </template>
+                        </tr>
+                    </thead>
+                </table>
+            </template>
+        </div>
+    </lightning-card>
+</template>

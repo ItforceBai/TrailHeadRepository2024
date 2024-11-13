@@ -1,0 +1,88 @@
+<template>
+    <div class="slds-form-element_horizontal slds-form-element">
+        <label if:true={label} class='slds-form-element__label' for="combobox">
+            <abbr if:true={required} title="必須" class="slds-required">*</abbr>
+            {label}
+        </label>
+        <div class="slds-form-element__control" style={getPaddingStyle}>
+            <div class={getContainerClass}>
+                <div class={getDropdownClass} aria-expanded={hasResults} aria-haspopup="listbox" role="combobox">
+                    <!-- Search input start -->
+                    <div class={getComboboxClass} role="none">
+                        <lightning-icon icon-name={iconName} size="small" alternative-text="Selected item icon"
+                            class={getSelectIconClass}></lightning-icon>
+                        <!-- Text input -->
+                        <!-- "style="border: 1.5px solid rgb(201, 201, 201);" -->
+                        <!-- style="var(--lwc-borderWidthThin,1px) solid var(--slds-c-input-color-border, var(--sds-c-input-color-border, var(--lwc-colorBorderInput,rgb(201, 201, 201))))" -->
+                        <input type="text" class={getInputClass} aria-autocomplete="list" aria-controls="listbox"
+                            autocomplete="off" role="textbox" id="combobox" placeholder={placeholder}
+                            value={getInputValue} title={getInputTitle} readonly={isInputReadonly} disabled={disabled}
+                            onfocus={handleFocus} onblur={handleBlur} oninput={handleInput} onkeydown={handleKeyDown} />
+                        <!-- Search icon -->
+                        <lightning-icon icon-name="utility:search" size="x-small" alternative-text="Search icon"
+                            class={getSearchIconClass}></lightning-icon>
+                        <!-- Clear selection button icon for single entry lookups -->
+                        <button title="クリア" type="button" onclick={handleClearSelection}
+                            class={getClearSelectionButtonClass} if:false={disabled}>
+                            <lightning-icon icon-name="utility:close" size="x-small" alternative-text="クリア"
+                                class="slds-button__icon"></lightning-icon>
+                        </button>
+                    </div>
+                    <!-- Search input end -->
+
+                    <!-- Result list box start -->
+                    <div id="listbox" role="listbox" onmousedown={handleComboboxMouseDown}
+                        onmouseup={handleComboboxMouseUp}>
+                        <ul class={getListboxClass} role="presentation" style="max-height: 11rem; overflow: auto;">
+                            <!-- Spinner to display when waiting for results of search -->
+                            <div if:true={loading}>
+                                <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+                            </div>
+
+                            <!-- Result list start -->
+                            <template for:each={searchResultsLocalState} for:item="item" if:true={hasResults}>
+                                <li key={item.result.Id} role="presentation">
+                                    <span role="option" onclick={handleResultClick} data-recordid={item.result.Id}
+                                        class={item.classes}>
+                                        <span class="slds-media__figure">
+                                            <lightning-icon icon-name={iconName} size="small"
+                                                alternative-text="Result item icon"></lightning-icon>
+                                        </span>
+                                        <span class="slds-media__body">
+                                            <span class="slds-truncate">{item.result.Name}</span>
+                                        </span>
+                                    </span>
+                                </li>
+                            </template>
+                            <!-- Result list end -->
+
+                            <!-- No results start -->
+                            <template if:false={hasResults}>
+                                <li role="presentation">
+                                    <span class="slds-media slds-listbox__option_entity" role="option">
+                                        <span if:false={loading} class="slds-media__body">検索結果なし</span>
+                                        <span if:true={loading} class="slds-media__body">検索中</span>
+                                    </span>
+                                </li>
+                            </template>
+                            <!-- No results end -->
+                        </ul>
+                    </div>
+                    <!-- Result list box end -->
+                </div>
+            </div>
+            <!-- Errors start -->
+            <template if:true={isShowErrorMsg}>
+                <label role="alert" class="slds-form-element__label slds-var-m-top_xx-small form-error">
+                    選択リストからオプションを選択するか、検索語を削除してください。
+                </label>
+            </template>
+            <template for:each={errors} for:item="error">
+                <label key={error.id} role="alert" class="slds-form-element__label slds-var-m-top_xx-small form-error">
+                    {error.message}
+                </label>
+            </template>
+            <!-- Errors end -->
+        </div>
+    </div>
+</template>
