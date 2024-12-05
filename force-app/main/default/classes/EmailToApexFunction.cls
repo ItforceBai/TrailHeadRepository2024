@@ -2,8 +2,8 @@
  * @description       : メールサービス用
  * @author            : ItForce-bai
  * @group             : ItForce
- * @last modified on  : 2024-11-13
- * @last modified by  : ItForce-bai
+ * @last modified on  : 2024-11-28
+ * @last modified by  : Itforce-Bai
  * Modifications Log
  * Ver   Date         Author        Modification
  * 1.0   2024-11-13   ItForce-bai   Initial Version
@@ -60,7 +60,7 @@ global with sharing class EmailToApexFunction implements Messaging.InboundEmailH
             // ケースを作成
             Case codeCase = new Case();
             // Web メール
-            codeCase.SuppliedEmail = email.fromName;
+            codeCase.SuppliedEmail = email.fromAddress;
             // 状況
             codeCase.Status = 'New';
             // 発生源
@@ -82,7 +82,7 @@ global with sharing class EmailToApexFunction implements Messaging.InboundEmailH
             // 完了予定日
             newOpp.CloseDate = System.today().toStartOfMonth().addMonths(1).addDays(-1);
             // 説明
-            newOpp.Description = email.plainTextBody;
+            newOpp.Description = email.subject + '<br>' + email.plainTextBody;
             // 関連ケース
             newOpp.Case__c = codeCase.Id;
             insert newOpp;
