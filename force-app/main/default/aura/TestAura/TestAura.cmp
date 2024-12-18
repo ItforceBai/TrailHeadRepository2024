@@ -1,0 +1,66 @@
+<!--
+    @description       : 测试用Aura画面
+    @author            : Itforce-Bai
+    @group             : ItForce
+    @last modified on  : 2024-12-18
+    @last modified by  : Itforce-Bai
+    Modifications Log
+    Ver   Date         Author        Modification
+    1.0   2024-12-10   Itforce-Bai   Initial Version
+-->
+<aura:component implements="force:hasSObjectName,force:hasRecordId,force:lightningQuickActionWithoutHeader" controller="TestController" >
+
+    <!-- 画面調整 -->
+    <aura:html tag="style">
+        .cuf-content { padding: 0 0rem !important; }
+        .slds-p-around--medium { padding: 0rem !important; }
+        .slds-modal__content{ height:unset !important; max-height:unset !important; }
+        .slds-modal__container{ max-width:60rem !important; width:60% !important; }
+    </aura:html>
+
+    <aura:attribute name="isLoadSpinner" type="Boolean" default="false"/>
+    <aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="estimateDetailList" type="EstimateDetail__c" />
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+
+    <aura:if isTrue="{!v.isLoadSpinner}">
+        <lightning:spinner aura:id="loadSpinner" variant="brand" size="large" alternativeText="保存しています。ページ移動せず、お待ちください。"/>
+    </aura:if>
+
+    <div>
+        <div class="modal-header slds-modal__header my-header">
+            <h2 class="title slds-text-heading--medium">测试用Aura画面</h2>
+        </div>
+    </div>
+
+    <div class="slds-scope" aura:Id="divDatalist" style="height:300px; overflow:auto;background-color: rgb(250, 250, 249);padding:10px 5px;">
+        <table class="slds-table slds-table_bordered slds-table_col-bordered comm-table mini-layout" style="margin-top: 10px;">
+            <thead>
+                <tr class="slds-line-height_reset head-sticky">
+                    <th>見積明細名</th>
+                    <th>数量</th>
+                    <th>単価</th>
+                    <th>小計額</th>
+                </tr>
+            </thead>
+            <tbody>
+                <aura:iteration items="{!v.estimateDetailList}" var="item" indexVar="index">
+                    <tr data-id="{!item.Id}">
+                        <td>{!item.Name}</td>
+                        <td>{!item.ESD_Amount__c}</td>
+                        <td>{!item.ESD_UnitPrice__c}</td>
+                        <td>{!item.ESD_TotalPrice__c}</td>
+                    </tr>
+                </aura:iteration>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="modal-footer slds-modal__footer">
+        <div class="forceModalActionContainer--footerAction forceModalActionContainer">
+            <button class="slds-button slds-button_neutral">キャンセル</button>
+            <button class="slds-button slds-button_brand">保存</button>
+        </div>
+	</div>
+</aura:component>
