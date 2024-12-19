@@ -2,8 +2,8 @@
  * @description       : 請求書作成
  * @author            : ItForce-bai
  * @group             : ItForce
- * @last modified on  : 2024-11-13
- * @last modified by  : ItForce-bai
+ * @last modified on  : 2024-12-18
+ * @last modified by  : Itforce-Bai
  * Modifications Log
  * Ver   Date         Author        Modification
  * 1.0   2024-11-01   ItForce-bai   Initial Version
@@ -26,7 +26,7 @@ export default class CreateInvoicePdf extends NavigationMixin(LightningElement) 
     // title = '検索結果：0件';
     title = '検索結果';
     // 請求金額合計
-    TotalBillingAmount = 0;
+    TotalRequestAmount = 0;
     // 全て選択FLG
     requestAllCheckFlg = false;
     // タブ表示フラグ
@@ -107,7 +107,7 @@ export default class CreateInvoicePdf extends NavigationMixin(LightningElement) 
                 })
                 this.requestAllCheckFlg = false;
                 // 金額クリア
-                this.TotalBillingAmount = 0;
+                this.TotalRequestAmount = 0;
                 // スクロールの調整
                 if (navigator.platform.indexOf("Win") == 0) {
                     this.changeScroll = result.Data.length > 13;
@@ -126,10 +126,10 @@ export default class CreateInvoicePdf extends NavigationMixin(LightningElement) 
         this.conditionInfo = {};
     }
 
-    // 請求書
-    doDownload() {
+    // 請求書プレビュー
+    doPreviewPdf() {
         try{
-            // 請求書を作成
+            // 請求Id
             let requestIdList = [];
             let selectedRows = this.template.querySelectorAll('lightning-input[data-name=resultCheckBox]');
             for (let i = 0; i < selectedRows.length; i++) {
@@ -140,7 +140,34 @@ export default class CreateInvoicePdf extends NavigationMixin(LightningElement) 
             }
             // チェック処理
             if (requestIdList.length == 0) {
-                com.showErrorMessage(this, '請求書作成対象がありませんなので、請求書を選択してください。');
+                com.showErrorMessage(this, '請求書プレビュー対象がありませんなので、請求データを選択してください。');
+                return;
+            }
+            this.isLoading = true;
+            // 請求書
+            window.open('/apex/InvoicePdfPage?id=' + requestIdList);
+        } catch (error) {
+            com.showErrorMessage(this, error);
+        } finally {
+            this.isLoading = false;
+        }
+    }
+
+    // 請求書作成
+    doDownloadPdf() {
+        try{
+            // 請求Id
+            let requestIdList = [];
+            let selectedRows = this.template.querySelectorAll('lightning-input[data-name=resultCheckBox]');
+            for (let i = 0; i < selectedRows.length; i++) {
+                // チェック済み
+                if (selectedRows[i].checked) {
+                    requestIdList.push(this.resultList[i].Id);
+                }
+            }
+            // チェック処理
+            if (requestIdList.length == 0) {
+                com.showErrorMessage(this, '請求書作成対象がありませんなので、請求データを選択してください。');
                 return;
             }
             this.isLoading = true;
@@ -148,7 +175,7 @@ export default class CreateInvoicePdf extends NavigationMixin(LightningElement) 
             // this[NavigationMixin.Navigate]({
             //     type: 'standard__webPage',
             //     attributes: {
-            //         url: '/apex/InvoiceList?id=' + requestIdList
+            //         url: '/apex/InvoicePdfPage?id=' + requestIdList
             //     }
             // })
         } catch (error) {
@@ -167,11 +194,11 @@ export default class CreateInvoicePdf extends NavigationMixin(LightningElement) 
         // 印刷チェックボックス
         this.resultList[index].selectFlg = !this.resultList[index].selectFlg;
         // 請求金額
-        var billingAmount = this.resultList[index].RQ_BillingAmount__c;
+        var requestAmount = this.resultList[index].RQ_RequestAmount__c;
         if (this.resultList[index].selectFlg) {
-            this.TotalBillingAmount += billingAmount;
+            this.TotalRequestAmount += requestAmount;
         } else {
-            this.TotalBillingAmount -= billingAmount;
+            this.TotalRequestAmount -= requestAmount;
         }
         // 全て選択FLGチェック
         this._requestAllCheckFlg();
@@ -195,14 +222,14 @@ export default class CreateInvoicePdf extends NavigationMixin(LightningElement) 
         });
         if (event.target.checked) {
             // 金額クリア
-            this.TotalBillingAmount = 0;
+            this.TotalRequestAmount = 0;
             // 金額合計
             this.resultList.forEach(item => {
-                this.TotalBillingAmount += item.RQ_BillingAmount__c;
+                this.TotalRequestAmount += item.RQ_RequestAmount__c;
             })
         } else {
             // 金額クリア
-            this.TotalBillingAmount = 0;
+            this.TotalRequestAmount = 0;
         }
     }
 

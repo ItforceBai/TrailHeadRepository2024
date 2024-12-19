@@ -2,7 +2,7 @@
     @description       : 测试用Aura画面
     @author            : Itforce-Bai
     @group             : ItForce
-    @last modified on  : 2024-12-18
+    @last modified on  : 2024-12-19
     @last modified by  : Itforce-Bai
     Modifications Log
     Ver   Date         Author        Modification
@@ -34,7 +34,7 @@
         </div>
     </div>
 
-    <div class="slds-scope" aura:Id="divDatalist" style="height:300px; overflow:auto;background-color: rgb(250, 250, 249);padding:10px 5px;">
+    <div class="slds-scope" aura:Id="divDatalist" style="height:400px; overflow:auto;background-color: rgb(250, 250, 249);padding:10px 15px;">
         <table class="slds-table slds-table_bordered slds-table_col-bordered comm-table mini-layout" style="margin-top: 10px;">
             <thead>
                 <tr class="slds-line-height_reset head-sticky">
@@ -42,15 +42,30 @@
                     <th>数量</th>
                     <th>単価</th>
                     <th>小計額</th>
+                    <th>備考</th>
                 </tr>
             </thead>
             <tbody>
                 <aura:iteration items="{!v.estimateDetailList}" var="item" indexVar="index">
                     <tr data-id="{!item.Id}">
+                        <!-- 見積明細名 -->
                         <td>{!item.Name}</td>
-                        <td>{!item.ESD_Amount__c}</td>
-                        <td>{!item.ESD_UnitPrice__c}</td>
-                        <td>{!item.ESD_TotalPrice__c}</td>
+                        <!-- 数量 -->
+                        <td style="width: 80px;">
+                            <lightning:input variant="label-hidden" type="number" name="ESDAmount" value="{!item.ESD_Amount__c}" />
+                        </td>
+                        <!-- 単価 -->
+                        <td style="width: 120px;">
+                            <lightning:input variant="label-hidden" type="number" name="ESDUnitPrice" value="{!item.ESD_UnitPrice__c}" />
+                        </td>
+                        <!-- 小計額 -->
+                        <td style="width: 120px;">
+                            <lightning:formattedNumber class="ipt-mark jpy" value="{!item.ESD_TotalPrice__c}"></lightning:formattedNumber>
+                        </td>
+                        <!-- 備考 -->
+                        <td>
+                            <lightning:textarea name="ESDMemo" variant="label-hidden" value="{!item.ESD_Memo__c}" />
+                        </td>
                     </tr>
                 </aura:iteration>
             </tbody>
@@ -59,8 +74,8 @@
 
     <div class="modal-footer slds-modal__footer">
         <div class="forceModalActionContainer--footerAction forceModalActionContainer">
-            <button class="slds-button slds-button_neutral">キャンセル</button>
-            <button class="slds-button slds-button_brand">保存</button>
+            <button class="slds-button slds-button_neutral" onclick="{!c.doCancel}">キャンセル</button>
+            <button class="slds-button slds-button_brand" onclick="{!c.doSave}">保存</button>
         </div>
 	</div>
 </aura:component>

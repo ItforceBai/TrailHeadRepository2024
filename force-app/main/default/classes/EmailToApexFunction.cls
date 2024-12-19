@@ -2,7 +2,7 @@
  * @description       : メールサービス用
  * @author            : ItForce-bai
  * @group             : ItForce
- * @last modified on  : 2024-11-28
+ * @last modified on  : 2024-12-19
  * @last modified by  : Itforce-Bai
  * Modifications Log
  * Ver   Date         Author        Modification
@@ -82,7 +82,7 @@ global with sharing class EmailToApexFunction implements Messaging.InboundEmailH
             // 完了予定日
             newOpp.CloseDate = System.today().toStartOfMonth().addMonths(1).addDays(-1);
             // 説明
-            newOpp.Description = email.subject + '<br>' + email.plainTextBody;
+            newOpp.Description = email.subject + '\n⇓\n' + email.plainTextBody;
             // 関連ケース
             newOpp.Case__c = codeCase.Id;
             insert newOpp;

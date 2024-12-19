@@ -1,2 +1,8 @@
-.THIS {
+.THIS .ipt-mark {
+    display: flex;
+    justify-content: flex-end;
+}
+.THIS .jpy.ipt-mark::after {
+    content: "円";
+    padding: 0 0.3rem;
 }

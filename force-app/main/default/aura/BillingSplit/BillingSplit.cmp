@@ -1,0 +1,77 @@
+<!--
+  @description       : 請求分割画面
+  @author            : Itforce-WangXize
+  @group             : 
+  @last modified on  : 2024-12-17
+  @last modified by  : Itforce-WangXize
+-->
+<aura:component implements="force:hasSObjectName,force:hasRecordId,force:lightningQuickActionWithoutHeader" controller="SplitController" >
+    <aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="requestDetailList" type="Object[]" />
+    <aura:attribute name="newRequestDetailList" type="String[]" />
+    <aura:attribute name="oldDiscountsNumberList" type="List" />
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+
+    <div class="slds-modal__container">
+        <!--ヘッダー-->
+        <div class="slds-modal__header">
+            <h2 class="slds-text-heading_medium">請求分割</h2>
+        </div>
+        <div class="slds-modal__content">
+            <!--請求明細テーブル-->
+            <table>
+                <thead>
+                    <tr>
+                        <th>請求明細名</th>
+                        <th>商品名</th>
+                        <th>数量</th>
+                        <th>請求期日</th>
+                        <th>割引回数</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <aura:iteration items="{!v.requestDetailList}" var="requestDetailObj" indexVar="index">
+                        <tr>
+                            <td>{!requestDetailObj.Name}</td>
+                            <td>{!requestDetailObj.RQD_ProductName__c}</td>
+                            <td>{!requestDetailObj.RQD_Quantity__c}</td>
+                            <td>{!requestDetailObj.RQD_Request__r.RQ_InvoiceSendDate__c}</td>
+                            <td>
+                                <lightning:input name="{!index}" disabled="false" onblur="{!c.discountsNumberBlur}" type="number"/>
+                            </td>
+                        </tr>
+                    </aura:iteration>
+                </tbody>
+            </table>
+            <!--割引回数テーブル-->
+            <table>
+                <thead>
+                    <tr>
+                        <th>請求明細名</th>
+                        <th><span style="color: red;">*</span>数量</th>
+                        <th><span style="color: red;">*</span>請求期日</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <aura:iteration items="{!v.newRequestDetailList}" var="newRequestDetailObj" indexVar="index">
+                        <tr>
+                            <td>{!newRequestDetailObj}</td>
+                            <td>
+                                <lightning:input name="{!'num_'+index}" disabled="false" onblur="{!c.quantitychange}" type="number" />
+                            </td>
+                            <td>
+                                <lightning:input name="{!'date_'+index}" onblur="{!c.invoiceSendDateChange}" type="date" />
+                            </td>
+                        </tr>
+                    </aura:iteration>
+                </tbody>
+            </table>
+            <!--ボタン-->
+            <div>
+                <lightning:button disabled="false" aura:id="cancel">キャンセル</lightning:button>
+                <lightning:button disabled="true" aura:id="saveButton" variant="brand" onclick="{!c.save}">実行</lightning:button>
+            </div>
+        </div>
+    </div>
+</aura:component>

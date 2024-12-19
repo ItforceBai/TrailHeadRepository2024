@@ -1,0 +1,102 @@
+<!--
+  @description       : 請求書
+  @author            : ItForce-bai
+  @group             : ITF
+  @last modified on  : 2024-12-19
+  @last modified by  : Itforce-Bai
+-->
+<apex:page Controller="InvoicePdfPageCtrl" renderAs="pdf" applyHtmlTag="false" applyBodyTag="false" showHeader="false" contentType="application/pdf">
+	<html>
+        <apex:variable var="index" value="{!1}" />
+		<head>
+			<style>
+				@page {
+                    size: A4;
+                    margin-left: 17mm;
+                    margin-right: 17mm;
+                    @bottom-center {
+                        content:  counter(page) "/ " counter(pages);
+                    }
+                }
+                p {
+                    font-size: 8pt;
+                }
+                /* フォントの指定 */
+                body {
+                    font-family: Arial Unicode MS;
+                }
+                /* テーブルのスタイル */
+                .tdStyle {
+                    border:solid black 1.0pt;
+                    height:12.0pt;
+                    padding:.3pt .3pt .3pt .3pt;
+                    text-align: center;
+                }
+			</style>
+		</head>
+
+		<body>
+            <!-- 請求書情報 -->
+            <apex:repeat value="{!requestList}" var="request">
+                <div style="text-align:center">
+                    <p style="margin-top: 30px;font-size: 12pt;">請求書プレビュー</p>
+                </div>
+                <div>
+                    <table cellspacing="0" cellpadding="0" style="margin-left: 3em; width:450pt; border-collapse:collapse;">
+                        <tbody>
+                            <tr>
+                                <td class="tdStyle" style="width:50pt; ">
+                                    <p>請求明細No</p>
+                                </td>
+                                <td class="tdStyle" style="width:200pt; ">
+                                    <p>商品名</p>
+                                </td>
+                                <td class="tdStyle" style="width:80pt; ">
+                                    <p>数量</p>
+                                </td>
+                                <td class="tdStyle" style="width:80pt; ">
+                                    <p>単価</p>
+                                </td>
+                                <td class="tdStyle" style="width:80pt; ">
+                                    <p>小計額</p>
+                                </td>
+                            </tr>
+                            <!-- 請求明細情報 -->
+                            <apex:repeat value="{!request.RequestDetail__r}" var="detail">
+                                <tr>
+                                    <!-- 請求明細No -->
+                                    <td class="tdStyle" style="width:50pt; ">
+                                        <p>
+                                            <apex:outputText value="{!index}"/>
+                                            <apex:variable var="index" value="{!index+1}"/>
+                                        </p>
+                                    </td>
+                                    <!-- 商品名 -->
+                                    <td class="tdStyle" style="width:200pt; ">
+                                        <p>{!detail.RQD_ProductName__r.Name}</p>
+                                    </td>
+                                    <!-- 数量 -->
+                                    <td class="tdStyle" style="width:80pt; ">
+                                        <p>{!detail.RQD_Quantity__c}</p>
+                                    </td>
+                                    <!-- 単価 -->
+                                    <td class="tdStyle" style="width:80pt; ">
+                                        <p>{!detail.RQD_UnitPrice__c}</p>
+                                    </td>
+                                    <!-- 小計額 -->
+                                    <td class="tdStyle" style="width:80pt; ">
+                                        <p>{!detail.RQD_RequestAmount__c}</p>
+                                    </td>
+                                </tr>
+                            </apex:repeat>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- 改ページ -->
+                <apex:outputText rendered="{!request != requestList[requestList.size - 1]}">
+                    <div style="page-break-before: always;"><br/></div>
+                </apex:outputText>
+            </apex:repeat>
+		</body>
+    </html>
+</apex:page>

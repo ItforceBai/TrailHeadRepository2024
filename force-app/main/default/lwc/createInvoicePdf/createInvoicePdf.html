@@ -2,8 +2,8 @@
   @description       : 請求書作成
   @author            : ItForce-bai
   @group             : ItForce
-  @last modified on  : 2024-11-11
-  @last modified by  : ItForce-bai
+  @last modified on  : 2024-12-19
+  @last modified by  : Itforce-Bai
   Modifications Log
   Ver   Date         Author        Modification
   1.0   2024-11-01   ItForce-bai   Initial Version
@@ -76,8 +76,22 @@
         <template if:true={tabShowFlg}>
             <!-- ボタン -->
             <div slot="actions">
-                <lightning-button label="請求書作成" title="請求書作成" variant="brand-outline" icon-name="utility:download"
-                    class="slds-m-left_x-small" onclick={doDownload}></lightning-button>
+                <lightning-button
+                    label="請求書プレビュー"
+                    title="請求書プレビュー"
+                    variant="brand-outline"
+                    icon-name="utility:overflow"
+                    class="slds-m-left_x-small"
+                    onclick={doPreviewPdf}>
+                </lightning-button>
+                <lightning-button
+                    label="請求書作成"
+                    title="請求書作成"
+                    variant="brand-outline"
+                    icon-name="utility:download"
+                    class="slds-m-left_x-small"
+                    onclick={doDownloadPdf}>
+                </lightning-button>
             </div>
         </template>
         <div style="min-height: 30rem;">
@@ -130,25 +144,31 @@
                                             data-index={idx} data-name="resultCheckBox"
                                             variant="label-hidden"></lightning-input>
                                     </td>
+                                    <!-- 請求期日 -->
                                     <td scope="col" class="font-center" style="width:10%;">
                                         <lightning-formatted-date-time
                                             value={result.RQ_InvoiceSendDate__c}></lightning-formatted-date-time>
                                     </td>
+                                    <!-- 商談名 -->
                                     <td scope="col" style="width:10%;">
                                         <a href={result.OppLink} tabindex="-1"
                                             target="_blank">{result.RQ_Opportunity__r.Name}</a>
                                     </td>
+                                    <!-- 見積No -->
                                     <td scope="col" style="width:10%;">
                                         <a href={result.EstimateLink} tabindex="-1"
                                             target="_blank">{result.RQ_Estimate__r.Name}</a>
                                     </td>
+                                    <!-- 請求No -->
                                     <td scope="col" style="width:10%;">
                                         <a href={result.RequestLink} tabindex="-1" target="_blank">{result.Name}</a>
                                     </td>
+                                    <!-- 請求金額 -->
                                     <td scope="col" class="font-right" style="width:8%;">
                                         <lightning-formatted-number data-name="BillingAmount" maximum-fraction-digits="2"
                                             value={result.RQ_RequestAmount__c}></lightning-formatted-number>
                                     </td>
+                                    <!-- 請求書作成済み -->
                                     <td scope="col" class="font-center" style="width:5%;">
                                         <lightning-input type="checkbox" checked={result.RQ_InvoicedFlg__c}
                                             variant="label-hidden" disabled></lightning-input>
@@ -169,7 +189,7 @@
                             <th scope="col" class="font-center" style="width:10%"></th>
                             <th scope="col" class="font-right" style="width:8%">
                                 <lightning-formatted-number maximum-fraction-digits="2"
-                                    value={TotalBillingAmount}></lightning-formatted-number>
+                                    value={TotalRequestAmount}></lightning-formatted-number>
                             </th>
                             <th scope="col" class="font-center" style="width:5%"></th>
                             <template if:true={changeScroll}>

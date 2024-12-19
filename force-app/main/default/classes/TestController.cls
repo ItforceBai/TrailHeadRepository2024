@@ -2,7 +2,7 @@
  * @description       : 
  * @author            : Itforce-Bai
  * @group             : ItForce
- * @last modified on  : 2024-12-10
+ * @last modified on  : 2024-12-19
  * @last modified by  : Itforce-Bai
  * Modifications Log
  * Ver   Date         Author        Modification
@@ -24,7 +24,8 @@ public with sharing class TestController {
                 Name,
                 ESD_Amount__c,
                 ESD_UnitPrice__c,
-                ESD_TotalPrice__c
+                ESD_TotalPrice__c,
+                ESD_Memo__c
 
             FROM EstimateDetail__c
             WHERE ESD_Estimate__c = :recordId
